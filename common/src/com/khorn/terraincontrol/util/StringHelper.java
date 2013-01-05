@@ -70,7 +70,6 @@ public abstract class StringHelper
      */
     public static int readBlockId(String string) throws InvalidConfigException
     {
-        if(string.contains("SPONGE")) TerrainControl.log("parsing. " + string);
         // Parse . (Deprecated)
         if (string.indexOf('.') != -1)
         {
@@ -83,7 +82,6 @@ public abstract class StringHelper
         {
             // Ignore block data
             string = string.split(":")[0];
-            TerrainControl.log("parsing " + string);
         }
 
         DefaultMaterial material = DefaultMaterial.getMaterial(string);
