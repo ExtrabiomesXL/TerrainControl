@@ -18,8 +18,8 @@ public class NormalBiomeGenerator extends BiomeGenerator
         
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
-        this.unZoomedLayer = layers[1];
-        this.biomeLayer = layers[0];
+        this.unZoomedLayer = layers[0];
+        this.biomeLayer = layers[1];
     }
     
     @Override
