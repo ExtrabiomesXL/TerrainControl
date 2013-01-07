@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.biomegenerators;
 
-
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomelayers.layers.Layer;
 
@@ -50,7 +48,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         int[] arrayOfInt = this.biomeLayer.Calculate(x, z, x_size, z_size);
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigs.get(arrayOfInt[i]).getTemperature() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
             if (f1 < worldConfig.minTemperature)
                 f1 = worldConfig.minTemperature;
             if (f1 > worldConfig.maxTemperature)
@@ -72,7 +70,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         int[] arrayOfInt = this.biomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 = worldConfig.biomeConfigs.get(arrayOfInt[i]).getWetness() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
             if (f1 < worldConfig.minMoisture)
                 f1 = worldConfig.minMoisture;
             if (f1 > worldConfig.maxMoisture)

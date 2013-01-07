@@ -34,7 +34,6 @@ public abstract class StringHelper
     
     /**
      * Parses the string and returns a number between minValue and maxValue.
-     * Returns Resource.INCORRECT_NUMBER if the string is not a number.
      *
      * @param string    The string to parse.
      * @param minValue  The minimum value, inclusive.
@@ -47,6 +46,35 @@ public abstract class StringHelper
         try
         {
             int number = Integer.parseInt(string);
+            if (number < minValue)
+            {
+                return minValue;
+            }
+            if (number > maxValue)
+            {
+                return maxValue;
+            }
+            return number;
+        } catch (NumberFormatException e)
+        {
+            throw new InvalidConfigException("Incorrect number: " + string);
+        }
+    }
+    
+    /**
+     * Parses the string and returns a number between minValue and maxValue.
+     *
+     * @param string    The string to parse.
+     * @param minValue  The minimum value, inclusive.
+     * @param maxValue  The maximum value, inclusive.
+     * @return          The number in the String, capped at the minValue and maxValue.
+     * @throws InvalidConfigException If the number is invalid.
+     */
+    public static double readDouble(String string, double minValue, double maxValue) throws InvalidConfigException
+    {
+        try
+        {
+            double number = Double.parseDouble(string);
             if (number < minValue)
             {
                 return minValue;

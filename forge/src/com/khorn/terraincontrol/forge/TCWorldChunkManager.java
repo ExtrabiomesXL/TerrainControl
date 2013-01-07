@@ -161,7 +161,8 @@ public class TCWorldChunkManager extends WorldChunkManager
         return localChunkPosition;
     }
 
-    public void cleanUpcache()
+    @Override
+    public void cleanupCache()
     {
         this.biomeManager.cleanupCache();
     }

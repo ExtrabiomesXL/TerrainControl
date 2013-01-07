@@ -127,6 +127,7 @@ public enum TCDefaultValues implements TCSetting
     BiomeRarity(100),
     BiomeColor("", SettingsType.Color),
     BiomeRivers(true),
+    RiverBiome("River"),
     IsleInBiome("Ocean", SettingsType.StringArray),
     BiomeIsBorder("", SettingsType.StringArray),
     NotBorderNear("", SettingsType.StringArray),
@@ -305,7 +306,7 @@ public enum TCDefaultValues implements TCSetting
     private float fValue;
     private String sValue;
     private boolean bValue;
-    private Enum eValue;
+    private Enum<?> eValue;
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
 

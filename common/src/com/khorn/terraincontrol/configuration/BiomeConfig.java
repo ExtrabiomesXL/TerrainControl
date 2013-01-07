@@ -39,6 +39,7 @@ public class BiomeConfig extends ConfigFile
     public float BiomeWetness;
 
     public boolean BiomeRivers;
+    public String RiverBiome;
 
     public byte SurfaceBlock;
     public byte GroundBlock;
@@ -357,6 +358,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeColor = ReadModSettings(TCDefaultValues.BiomeColor.name(), this.DefaultColor);
 
         this.BiomeRivers = ReadModSettings(TCDefaultValues.BiomeRivers.name(), this.DefaultRiver);
+        this.RiverBiome = ReadModSettings(TCDefaultValues.RiverBiome.name(),this.DefaultRiverBiome);
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
@@ -612,6 +614,10 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
         this.writeNewLine();
 
+        writeComment("Biome name used as river in this biome");
+        writeValue(TCDefaultValues.RiverBiome.name(), this.RiverBiome);
+        this.writeNewLine();
+
         writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
         writeValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
         this.writeNewLine();
@@ -746,40 +752,46 @@ public class BiomeConfig extends ConfigFile
 
         this.writeNewLine();
         this.writeBigTitle("Resource queue");
-        this.writeComment("This section control all resources spawning after terrain generation");
+        this.writeComment("This section control all resources spawning after terrain generation.");
         this.writeComment("The resources will be placed in this order.");
         this.writeComment("");
         this.writeComment("Keep in mind that a high size, frequency or rarity might slow down terrain generation.");
         this.writeComment("");
         this.writeComment("Possible resources:");
-        this.writeComment("SmallLake(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("SmallLake(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.writeComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("UnderWaterOre(Block[.BlockData],Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Ore(Block[:Data],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("UnderWaterOre(Block[:Data],Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("CustomObject(Object[,AnotherObject[,...]])");
         this.writeComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.writeComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Plant(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Reed(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Cactus(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Liquid(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("AboveWaterRes(Block[.BlockData],Frequency,Rarity)");
+        this.writeComment("Reed(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Cactus(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Liquid(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("AboveWaterRes(Block[:Data],Frequency,Rarity)");
         this.writeComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("Vein(Block[:Data],MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("");
-        this.writeComment("Some comments:");
-        this.writeComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
-        this.writeComment("Rarity - chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
-        this.writeComment("MinAltitude and MaxAltitude - height limits");
-        this.writeComment("BlockSource - mean where or whereupon resource will be placed ");
-        this.writeComment("Tree types: Tree - BigTree - Forest (a birch tree) - HugeMushroom (not a tree but still counts)");
+        this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
+        this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
+        this.writeComment("MinAltitude and MaxAltitude: height limits");
+        this.writeComment("BlockSource: mean where or whereupon resource will be placed ");
+        this.writeComment("TreeType: Tree - BigTree - Forest (a birch tree) - HugeMushroom (not a tree but still counts)");
         this.writeComment("   Taiga1 - Taiga2 - JungleTree (the huge jungle tree) - GroundBush - CocoaTree");
         this.writeComment("   You can also use your own custom objects, as long as they have set Tree to true in their settings.");
+        this.writeComment("TreeType_Chance: similar Rarity. Example:");
+        this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
+        this.writeComment("  if that fails, it attempts to place Taiga2 (100% chance).");
+        this.writeComment("Object: can be a any kind of custom object (bo2 or bo3) but without the file extension. You can");
+        this.writeComment("also use UseWorld to spawn one of the object in the WorldObjects folder and UseBiome to spawn");
+        this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
+        this.writeComment("this biome in their spawnInBiome setting.");
         this.writeComment("");
-        this.writeComment("TreeType_Chance - similar Rarity. Example:");
-        this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin trying to 10 attempts, in each attempt he try place Taiga1 ( 35% chance ) if not he place Taiga2 (100% chance)");
-        this.writeComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
-        this.writeComment("Liquid resource is one block water or lava source");
+        this.writeComment("Plant and Grass resource: both a resource of one block. Plant can place blocks underground, Grass cannot.");
+        this.writeComment("Liquid resource: an one block water or lava source");
+        this.writeComment("Vein resource: not in vanilla. Creates an area where ores will spawn. Can be slow, so use a low Rarity (smaller than 1).");
         this.writeComment("");
 
         this.WriteResources();
@@ -1003,6 +1015,8 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        this.RiverBiome =  (DefaultBiome.Contain(this.RiverBiome) || this.worldConfig.CustomBiomes.contains(this.RiverBiome)) ? this.RiverBiome : "";
+
     }
 
     protected void RenameOldSettings()
@@ -1124,6 +1138,7 @@ public class BiomeConfig extends ConfigFile
     private ArrayList<String> DefaultBorder = new ArrayList<String>();
     private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
     private boolean DefaultRiver = true;
+    private String DefaultRiverBiome = DefaultBiome.RIVER.Name;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
     private String DefaultColor = "0x000000";
@@ -1149,6 +1164,8 @@ public class BiomeConfig extends ConfigFile
             case 0: // Ocean
                 this.DefaultColor = "0x3333FF";
                 this.DefaultStrongholds = false;
+                this.DefaultRiver = false;
+                this.DefaultRiverBiome = DefaultBiome.OCEAN.Name;
                 break;
             case 1: // Plains
                 this.DefaultTrees = 0;
@@ -1207,6 +1224,8 @@ public class BiomeConfig extends ConfigFile
             case 10: // FrozenOcean
                 this.DefaultColor = "0xFFFFFF";
                 this.DefaultStrongholds = false;
+                this.DefaultRiver = false;
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_OCEAN.Name;
                 break;
             case 11: // FrozenRiver
                 this.DefaultColor = "0x66FFFF";
@@ -1214,9 +1233,11 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 12: // Ice Plains
                 this.DefaultColor = "0xCCCCCC";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 13: // Ice Mountains
                 this.DefaultColor = "0xCC9966";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 14: // MushroomIsland
                 this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
@@ -1278,6 +1299,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultTrees = 10;
                 this.DefaultGrass = 10;
                 this.DefaultColor = "0x003300";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 20: // Extreme Hills Edge
                 this.DefaultSize = 8;
