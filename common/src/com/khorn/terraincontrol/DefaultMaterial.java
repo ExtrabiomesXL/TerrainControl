@@ -85,7 +85,7 @@ public enum DefaultMaterial
     REDSTONE_TORCH_ON(76, false),
     STONE_BUTTON(77, false),
     SNOW(78, false),
-    ICE(79),
+    ICE(79, false),
     SNOW_BLOCK(80),
     CACTUS(81),
     CLAY(82),
@@ -152,20 +152,45 @@ public enum DefaultMaterial
     WOOD_BUTTON(143, false),
     SKULL(144, false),
     ANVIL(145, false),
+    TRAPPED_CHEST(146),
+    GOLD_PLATE(147, false),
+    IRON_PLATE(148, false),
+    REDSTONE_COMPARATOR_OFF(149, false),
+    REDSTONE_COMPARATOR_ON(150, false),
+    DAYLIGHT_DETECTOR(151, false),
+    REDSTONE_BLOCK(152),
+    QUARTZ_ORE(153),
+    HOPPER(154),
+    QUARTZ_BLOCK(155),
+    QUARTZ_STAIRS(156),
+    ACTIVATOR_RAIL(157, false),
+    DROPPER(158),
     UNKNOWN_BLOCK(255);
 
     public final int id;
     private final boolean solid;
 
-    private DefaultMaterial(int Id, boolean _solid)
+    /**
+     * Creates a new material.
+     * 
+     * @param id    Id of the material.
+     * @param solid Whether the material is solid. If set to false, it will prevent snowfall.
+     *              Note: this isn't always equal to what Minecraft calls solid.
+     */
+    private DefaultMaterial(int id, boolean solid)
     {
-        this.id = Id;
-        this.solid = _solid;
+        this.id = id;
+        this.solid = solid;
     }
 
-    private DefaultMaterial(int Id)
+    /**
+     * Creates a new solid material where snow will fall on.
+     * 
+     * @param id Id of the material.
+     */
+    private DefaultMaterial(int id)
     {
-        this.id = Id;
+        this.id = id;
         this.solid = true;
     }
 

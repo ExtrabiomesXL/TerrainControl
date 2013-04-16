@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_4_6.*;
+import net.minecraft.server.v1_5_R2.*;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-class StrongholdStart extends StructureStart
+public class StrongholdStart extends StructureStart
 {
 
     @SuppressWarnings({"unchecked", "rawtypes"})

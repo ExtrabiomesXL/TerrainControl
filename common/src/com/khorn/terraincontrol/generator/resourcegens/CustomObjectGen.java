@@ -21,13 +21,14 @@ public class CustomObjectGen extends Resource
         if (args.size() == 0 || (args.size() == 1 && args.get(0).trim().equals("")))
         {
             // Backwards compability
-            args.set(0, "UseWorld");
+            args = new ArrayList<String>();
+            args.add("UseWorld");
         }
         objects = new ArrayList<CustomObject>();
         objectNames = new ArrayList<String>();
         for (String arg : args)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder());
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder().worldConfig);
             if (object == null || !object.canSpawnAsObject())
             {
                 throw new InvalidConfigException("No custom object found with the name " + arg);

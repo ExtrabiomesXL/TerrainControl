@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.v1_4_6.*;
+import net.minecraft.server.v1_5_R2.*;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,13 +19,15 @@ import java.util.Random;
 
 public class BukkitWorld implements LocalWorld
 {
+    // Initially false, set to true when enabled once
+    private boolean initialized;
+
     private TCChunkGenerator generator;
-    private World world;
+    private WorldServer world;
     private WorldConfig settings;
+    private CustomObjectStructureCache structureCache;
     private String name;
-    private long seed;
-    private IBiomeManager biomeManager;
-    private TCWorldChunkManagerOld oldBiomeManager;
+    private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
     private static int maxBiomeCount = 256;
@@ -130,7 +136,7 @@ public class BukkitWorld implements LocalWorld
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
 
         biomeBaseArray = this.world.worldProvider.d.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -144,7 +150,7 @@ public class BukkitWorld implements LocalWorld
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
         return this.world.worldProvider.d.getTemperatures(null, x, z, x_size, z_size);
     }
 
@@ -152,7 +158,7 @@ public class BukkitWorld implements LocalWorld
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
 
         biomeBaseArray = this.world.worldProvider.d.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -166,14 +172,15 @@ public class BukkitWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomeTC(x, z);
+            return this.biomeManager.getBiome(x, z);
         return this.world.worldProvider.d.getBiome(x, z).id;
     }
 
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.oldBiomeManager.old_temperature[index] * this.oldBiomeManager.old_rain[index];
+        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
+        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override
@@ -231,19 +238,19 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
-        boolean Village = false;
+        boolean villageGenerated = false;
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.villagesEnabled)
-            Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
+            villageGenerated = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.rareBuildingsEnabled)
             this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(this.world, rand, chunk_x, chunk_z);
 
-        return Village;
+        return villageGenerated;
     }
 
     // This part work with ReplacedBlocks after all spawns
@@ -277,10 +284,10 @@ public class BukkitWorld implements LocalWorld
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.a(sectionX, sectionY, sectionZ);
-                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.d() + sectionY];
+                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.d() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
@@ -297,7 +304,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBiomesLate()
+    public void replaceBiomes()
     {
         if (this.settings.HaveBiomeReplace)
         {
@@ -371,13 +378,14 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getTypeId(x, y, z);
+            int id = chunk.getTypeId(x & 0xF, y, z & 0xF);
             if (DefaultMaterial.getMaterial(id).isSolid())
-                return y;
+            {
+                return y + 1;
+            }
         }
         return -1;
     }
@@ -436,10 +444,18 @@ public class BukkitWorld implements LocalWorld
         if (applyPhysics)
         {
             int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
-            chunk.a(x & 15, y, z & 15, typeId, data);
+            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
+            // Workaround for (bug in?) CraftBukkit
+            if (chunk.i()[y >> 4] != null)
+                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
-            chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
+        {
+            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
+            // Workaround for (bug in?) Minecraft
+            if (chunk.i()[y >> 4] != null)
+                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
+        }
 
         if (updateLight)
         {
@@ -450,6 +466,7 @@ public class BukkitWorld implements LocalWorld
         {
             this.world.notify(x, y, z);
         }
+
     }
 
     @Override
@@ -493,7 +510,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.getLightLevel(x, y, z);
+        return world.m(x, y, z); // world.getBlockAndSkyLightAsItWereDay
     }
 
     @Override
@@ -517,7 +534,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public long getSeed()
     {
-        return this.seed;
+        return world.getSeed();
     }
 
     @Override
@@ -537,52 +554,109 @@ public class BukkitWorld implements LocalWorld
         return this.generator;
     }
 
+    public World getWorld()
+    {
+        return this.world;
+    }
+
+    /**
+     * Sets the new settings and deprecates any references to the old settings, if any.
+     * @param worldConfig The new settings.
+     */
     public void setSettings(WorldConfig worldConfig)
     {
+        if (this.settings != null)
+        {
+            this.settings.newSettings = worldConfig;
+            this.settings.isDeprecated = true;
+        }
         this.settings = worldConfig;
     }
 
-    public void Init(World _world)
+    /**
+     * Enables/reloads this BukkitWorld. If you are reloading, 
+     * don't forget to set the new settings first using 
+     * {@link #setSettings(WorldConfig)}.
+     * @param world The world that needs to be enabled.
+     */
+    public void enable(org.bukkit.World world)
     {
-        this.world = _world;
-        this.seed = world.getSeed();
+        WorldServer mcWorld = ((CraftWorld) world).getHandle();
 
-        // TODO check for mob burning issues
-        if (this.world.worldProvider.getName().equals("Overworld"))
+        // Do the things that always need to happen, whether we are enabling for
+        // the first time or reloading
+        this.world = mcWorld;
+        this.chunkCache = new Chunk[4];
+
+        // Inject our own WorldProvider
+        if (mcWorld.worldProvider.getName().equals("Overworld"))
         {
             // Only replace the worldProvider if it's the overworld
             // Replacing other dimensions causes a lot of glitches
-            this.world.worldProvider = new TCWorldProvider(this);
+            mcWorld.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
+        }
+        
+        // Inject our own BiomeManager (called WorldChunkManager)
+        Class<? extends BiomeGenerator> biomeModeClass = this.settings.biomeMode;
+        if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
+        {
+            TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
+            mcWorld.worldProvider.d = worldChunkManager;
+
+            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
+            worldChunkManager.setBiomeManager(biomeManager);
+            setBiomeManager(biomeManager);
         }
 
-        this.chunkCache = new Chunk[4];
-
-        switch (this.settings.ModeTerrain)
+        if (!initialized)
         {
+            // Things that need to be done only when enabling for the first time
+            this.structureCache = new CustomObjectStructureCache(this);
 
-            case Normal:
-            case OldGenerator:
-                this.strongholdGen = new StrongholdGen(settings);
-                this.villageGen = new VillageGen(settings);
-                this.mineshaftGen = new MineshaftGen();
-                this.pyramidsGen = new RareBuildingGen(settings);
-                this.netherFortress = new NetherFortressGen();
-            case NotGenerate:
-                this.tree = new WorldGenTrees(false);
-                this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
-                this.bigTree = new WorldGenBigTree(false);
-                this.forest = new WorldGenForest(false);
-                this.swampTree = new WorldGenSwampTree();
-                this.taigaTree1 = new WorldGenTaiga1();
-                this.taigaTree2 = new WorldGenTaiga2(false);
-                this.hugeMushroom = new WorldGenHugeMushroom();
-                this.jungleTree = new WorldGenMegaTree(false, 15, 3, 3);
-                this.groundBush = new WorldGenGroundBush(3, 0);
-            case TerrainTest:
-                this.generator.Init(this);
-                break;
-            case Default:
-                break;
+            switch (this.settings.ModeTerrain)
+            {
+                case Normal:
+                case OldGenerator:
+                    this.strongholdGen = new StrongholdGen(settings);
+                    this.villageGen = new VillageGen(settings);
+                    this.mineshaftGen = new MineshaftGen();
+                    this.pyramidsGen = new RareBuildingGen(settings);
+                    this.netherFortress = new NetherFortressGen();
+                case NotGenerate:
+                    this.tree = new WorldGenTrees(false);
+                    this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+                    this.bigTree = new WorldGenBigTree(false);
+                    this.forest = new WorldGenForest(false);
+                    this.swampTree = new WorldGenSwampTree();
+                    this.taigaTree1 = new WorldGenTaiga1();
+                    this.taigaTree2 = new WorldGenTaiga2(false);
+                    this.hugeMushroom = new WorldGenHugeMushroom();
+                    this.jungleTree = new WorldGenMegaTree(false, 15, 3, 3);
+                    this.groundBush = new WorldGenGroundBush(3, 0);
+                case TerrainTest:
+                    this.generator.Init(this);
+                    break;
+                case Default:
+                    break;
+            }
+
+            this.initialized = true;
+        } else
+        {
+            // Things that need to be done only on reloading
+            this.structureCache.reload(this);
+        }
+    }
+
+    /**
+     * Cleans up references of itself in Minecraft's native code.
+     */
+    public void disable()
+    {
+        // Restore old world provider if replaced
+        if (world.worldProvider instanceof TCWorldProvider)
+        {
+            world.worldProvider = ((TCWorldProvider) world.worldProvider).getOldWorldProvider();
         }
     }
 
@@ -591,14 +665,8 @@ public class BukkitWorld implements LocalWorld
         this.generator = _generator;
     }
 
-    public void setBiomeManager(IBiomeManager manager)
+    public void setBiomeManager(BiomeGenerator manager)
     {
-        this.biomeManager = manager;
-    }
-
-    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
-    {
-        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 
@@ -630,22 +698,42 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void attachMetadata(int x, int y, int z, Tag tag)
     {
-        if (Block.byId[world.getTypeId(x, y, z)] instanceof BlockContainer)
+        // Convert Tag to a native nms tag
+        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+        // Add the x, y and z position to it
+        nmsTag.setInt("x", x);
+        nmsTag.setInt("y", y);
+        nmsTag.setInt("z", z);
+        // Add that data to the current tile entity in the world
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity != null)
         {
-            // Because villages (and other stuctures) don't use our setBlock
-            // methods, the world can sometimes become out of sync. This
-            // workaround makes sure that no tile entity get's placed if it
-            // isn't save to do so.
-
-            // Convert Tag to a native nms tag
-            NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-            // Add the x, y and z position to it
-            nmsTag.setInt("x", x);
-            nmsTag.setInt("y", y);
-            nmsTag.setInt("z", z);
-            // Create a Tile Entity of it and add it to the world
-            TileEntity tileEntity = TileEntity.c(nmsTag);
-            world.setTileEntity(x, y, z, tileEntity);
+            tileEntity.a(nmsTag); // tileEntity.load
+        } else
+        {
+            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getTypeId(x, y, z));
         }
+    }
+
+    @Override
+    public Tag getMetadata(int x, int y, int z)
+    {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        NBTTagCompound nmsTag = new NBTTagCompound();
+        tileEntity.b(nmsTag); // tileEntity.save
+        nmsTag.remove("x");
+        nmsTag.remove("y");
+        nmsTag.remove("z");
+        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
+    }
+
+    @Override
+    public CustomObjectStructureCache getStructureCache()
+    {
+        return this.structureCache;
     }
 }

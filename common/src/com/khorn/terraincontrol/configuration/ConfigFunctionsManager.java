@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.generator.resourcegens.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class ConfigFunctionsManager
 {
@@ -21,6 +22,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
         registerConfigFunction("Cactus", CactusGen.class);
         registerConfigFunction("CustomObject", CustomObjectGen.class);
+        registerConfigFunction("CustomStructure", CustomStructureGen.class);
         registerConfigFunction("Dungeon", DungeonGen.class);
         registerConfigFunction("Grass", GrassGen.class);
         registerConfigFunction("Liquid", LiquidGen.class);
@@ -34,6 +36,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("UnderWaterOre", UnderWaterOreGen.class);
         registerConfigFunction("Vein", VeinGen.class);
         registerConfigFunction("Vines", VinesGen.class);
+        registerConfigFunction("Well", WellGen.class);
     }
 
     public void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> value)
@@ -72,12 +75,12 @@ public class ConfigFunctionsManager
             configFunction = clazz.newInstance();
         } catch (InstantiationException e)
         {
-            TerrainControl.log("Reflection error (Instantiation) while loading the resources: " + e.getMessage());
+            TerrainControl.log(Level.WARNING, "Reflection error (Instantiation) while loading the resources: " + e.getMessage());
             e.printStackTrace();
             return null;
         } catch (IllegalAccessException e)
         {
-            TerrainControl.log("Reflection error (IllegalAccess) while loading the resources: " + e.getMessage());
+            TerrainControl.log(Level.WARNING, "Reflection error (IllegalAccess) while loading the resources: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -89,13 +92,13 @@ public class ConfigFunctionsManager
             matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getHolderType").invoke(configFunction));
         } catch (Exception e)
         {
-            TerrainControl.log("Reflection error (" + e.getClass().getSimpleName() + ") while loading the resources: " + e.getMessage());
+            TerrainControl.log(Level.WARNING, "Reflection error (" + e.getClass().getSimpleName() + ") while loading the resources: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
         if (!matchingTypes)
         {
-            TerrainControl.log("Invalid resource " + name + " in " + locationOfResource + ": cannot be placed in this config file!");
+            TerrainControl.log(Level.WARNING, "Invalid resource " + name + " in " + locationOfResource + ": cannot be placed in this config file!");
             return null;
         }
 
@@ -105,11 +108,10 @@ public class ConfigFunctionsManager
         // Load it
         try
         {
-            configFunction.load(args);
+            configFunction.read(name, args);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log("Invalid resource " + name + " in " + locationOfResource + ": " + e.getMessage());
-            return null;
+            TerrainControl.log(Level.WARNING, "Invalid resource " + name + " in " + locationOfResource + ": " + e.getMessage());
         }
 
         // Return it

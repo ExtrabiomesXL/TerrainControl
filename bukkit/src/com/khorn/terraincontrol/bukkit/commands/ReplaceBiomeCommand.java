@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.bukkit.TCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class ReplaceBiomeCommand extends BaseCommand
             args.remove(0);
             if (world == null)
             {
-                sender.sendMessage(ErrorColor + "You need to select world");
+                sender.sendMessage(ERROR_COLOR + "You need to select world");
                 return true;
             }
         }
@@ -42,7 +42,7 @@ public class ReplaceBiomeCommand extends BaseCommand
         {
             if (sender instanceof ConsoleCommandSender)
             {
-                sender.sendMessage(ErrorColor + "You need to select world");
+                sender.sendMessage(ERROR_COLOR + "You need to select world");
                 return true;
             }
             world = (CraftWorld) ((Player) sender).getWorld();
@@ -58,7 +58,7 @@ public class ReplaceBiomeCommand extends BaseCommand
             args.remove(0);
         } catch (Exception e)
         {
-            sender.sendMessage(ErrorColor + "Wrong biome ids ");
+            sender.sendMessage(ERROR_COLOR + "Wrong biome ids ");
             return true;
         }
 

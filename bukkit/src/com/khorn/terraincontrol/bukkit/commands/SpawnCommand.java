@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.Rotation;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,12 +30,13 @@ public class SpawnCommand extends BaseCommand
     public boolean onCommand(CommandSender sender, List<String> args)
     {
         Player me = (Player) sender;
+        Random random = new Random();
 
         BukkitWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
 
         if (args.size() == 0)
         {
-            me.sendMessage(ErrorColor + "You must enter the name of the BO2.");
+            me.sendMessage(ERROR_COLOR + "You must enter the name of the BO2.");
             return true;
         }
         CustomObject spawnObject = null;
@@ -44,20 +46,20 @@ public class SpawnCommand extends BaseCommand
 
         if (spawnObject == null)
         {
-            sender.sendMessage(ErrorColor + "Object not found, use '/tc list' to list the available ones.");
+            sender.sendMessage(ERROR_COLOR + "Object not found, use '/tc list' to list the available ones.");
             return true;
         }
 
         Block block = this.getWatchedBlock(me, true);
         if (block == null)
             return true;
-
-        if (spawnObject.spawn(bukkitWorld, new Random(), block.getX(), block.getY(), block.getZ()))
+        
+        if (spawnObject.spawnForced(bukkitWorld, random, Rotation.NORTH, block.getX(), block.getY(), block.getZ()))
         {
-            me.sendMessage(BaseCommand.MessageColor + spawnObject.getName() + " was spawned.");
+            me.sendMessage(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned.");
         } else
         {
-            me.sendMessage(BaseCommand.ErrorColor + "BO2 cant be spawned over there.");
+            me.sendMessage(BaseCommand.ERROR_COLOR + "Object can't be spawned over there.");
         }
 
         return true;
@@ -82,7 +84,7 @@ public class SpawnCommand extends BaseCommand
 
         if (verbose)
         {
-            me.sendMessage(ErrorColor + "No block in sight.");
+            me.sendMessage(ERROR_COLOR + "No block in sight.");
         }
 
         return null;

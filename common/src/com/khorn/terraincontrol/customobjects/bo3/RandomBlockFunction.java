@@ -1,12 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-
-import com.khorn.terraincontrol.util.BlockHelper;
-
 import com.khorn.terraincontrol.configuration.Tag;
-
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.BlockHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +41,7 @@ public class RandomBlockFunction extends BlockFunction
             try
             {
                 blockChances.add((byte) readInt(args.get(i), 1, 100));
-                // If it can read the number at the position, it doesn't have
-                // metadata
+                // If it can read the number, it doesn't have metadata
                 metaDataNames.add("");
                 metaDataTags.add(null);
             } catch (InvalidConfigException e)
@@ -58,6 +54,10 @@ public class RandomBlockFunction extends BlockFunction
                 {
                     metaDataNames.add(args.get(i));
                     metaDataTags.add(metaData);
+                } else
+                {
+                    metaDataNames.add("");
+                    metaDataTags.add(null);
                 }
 
                 // Get the chance
@@ -97,8 +97,9 @@ public class RandomBlockFunction extends BlockFunction
         rotatedBlock.blockDatas = new ArrayList<Byte>(blockIds.size());
         for (int i = 0; i < blockDatas.size(); i++)
         {
-            rotatedBlock.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
+            rotatedBlock.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
         }
+        rotatedBlock.blockChances = blockChances;
         rotatedBlock.metaDataTags = metaDataTags;
         rotatedBlock.metaDataNames = metaDataNames;
 

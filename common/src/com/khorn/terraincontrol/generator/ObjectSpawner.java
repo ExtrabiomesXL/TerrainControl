@@ -30,14 +30,15 @@ public class ObjectSpawner
         int z = chunkZ * 16;
 
         // Get the BiomeConfig of the other corner
-        int biomeId = world.getBiomeId(x + 16, z + 16);
+        int biomeId = world.getBiomeId(x + 15, z + 15);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Get the random generator
-        this.rand.setSeed(world.getSeed());
+        long resourcesSeed = worldSettings.resourcesSeed != 0L? worldSettings.resourcesSeed : world.getSeed();
+        this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ world.getSeed());
+        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ resourcesSeed);
 
         // Generate structures
         boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
@@ -63,7 +64,7 @@ public class ObjectSpawner
         world.replaceBlocks();
 
         // Replace biomes
-        world.replaceBiomesLate();
+        world.replaceBiomes();
 
         // Replace settings after Reload command
         if (this.worldSettings.isDeprecated)
@@ -96,7 +97,7 @@ public class ObjectSpawner
                         } else
                         {
                             // Snow has to be placed on an empty space on a
-                            // solid block in the world
+                            // block that accepts snow in the world
                             if (world.getMaterial(blockToFreezeX, blockToFreezeY, blockToFreezeZ) == DefaultMaterial.AIR)
                             {
                                 if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid())

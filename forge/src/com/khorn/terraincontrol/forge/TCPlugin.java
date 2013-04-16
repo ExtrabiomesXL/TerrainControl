@@ -1,16 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.util.StringHelper;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
+import com.khorn.terraincontrol.util.StringHelper;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
@@ -29,7 +26,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.4")
+@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.10")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {

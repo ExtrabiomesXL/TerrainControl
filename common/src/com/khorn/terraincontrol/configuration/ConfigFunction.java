@@ -11,6 +11,12 @@ public abstract class ConfigFunction<T>
 {
     private T holder;
 
+    // Error handling
+    private boolean valid;
+    private String error;
+    private String inputName;
+    private List<String> inputArgs;
+
     @SuppressWarnings("unchecked")
     public void setHolder(Object holder)
     {
@@ -66,22 +72,84 @@ public abstract class ConfigFunction<T>
     }
 
     /**
+     * Loads the settings. Will set the internal invalid flag to true
+     * if something went wrong.
+     * 
+     * @param args List of args
+     * @throws InvalidConfigException If the syntax is invalid.
+     */
+    public final void read(String name, List<String> args) throws InvalidConfigException
+    {
+        try
+        {
+            load(args);
+        } catch (InvalidConfigException e)
+        {
+            this.valid = false;
+            this.error = e.getMessage();
+            this.inputArgs = args;
+            this.inputName = name;
+            // Rethrow
+            throw e;
+        }
+        valid = true;
+    }
+
+    /**
+     * Returns true if this ConfigFunction has a correct syntax.
+     * Returns false if the read method hasn't been called yet,
+     * or if the function has an incorrect syntax.
+     * 
+     * @return Whether this ConfigFunction has a correct syntax.
+     */
+    public boolean isValid()
+    {
+        return valid;
+    }
+    
+    /**
+     * Forcibly sets the internal valid flag of this function to the 
+     * specified value. As long as you are using the read method you
+     * shouldn't use this, as the read method will automatically set
+     * it to the correct value.
+     * 
+     * @param valid New value for the valid flag.
+     */
+    public void setValid(boolean valid)
+    {
+        this.valid = valid;
+    }
+
+    public final String write()
+    {
+        if (!valid)
+        {
+            // Show error message
+            return "## INVALID " + inputName.toUpperCase() + " - " + error + " ##" + System.getProperty("line.separator") + inputName + "(" + StringHelper.join(inputArgs, ",") + ")";
+        } else
+        {
+            return makeString();
+        }
+
+    }
+
+    /**
      * Loads the settings. Returns false if one of the arguments contains an
      * error.
      *
      * @param args List of args.
      * @return Returns false if one of the arguments contains an error,
      *         otherwise true.
-     * @throws InvalidConfigException If the resoure is invalid.
+     * @throws InvalidConfigException If the syntax is invalid.
      */
-    public abstract void load(List<String> args) throws InvalidConfigException;
+    protected abstract void load(List<String> args) throws InvalidConfigException;
 
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
      *
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
      */
-    public abstract String makeString();
+    protected abstract String makeString();
 
     /**
      * Parses the string and returns a number between minValue and maxValue.
@@ -96,7 +164,7 @@ public abstract class ConfigFunction<T>
     {
         return StringHelper.readInt(string, minValue, maxValue);
     }
-    
+
     /**
      * Parses the string and returns a number between minValue and maxValue.
      *
@@ -112,6 +180,18 @@ public abstract class ConfigFunction<T>
     }
 
     /**
+     * Parses the string and returns the rarity between 0.000001 and 100 (inclusive)
+     * 
+     * @param string The string to parse.
+     * @return The rarity.
+     * @throws InvalidConfigException If the number is invalid.
+     */
+    protected double readRarity(String string) throws InvalidConfigException
+    {
+        return StringHelper.readDouble(string, 0.000001, 100);
+    }
+
+    /**
      * Returns the block id with the given name.
      *
      * @param string
@@ -121,7 +201,7 @@ public abstract class ConfigFunction<T>
     {
         return StringHelper.readBlockId(string);
     }
-    
+
     /**
      * Reads all block ids from the start position until the end of the list.
      * 
@@ -134,11 +214,11 @@ public abstract class ConfigFunction<T>
     protected List<Integer> readBlockIds(List<String> strings, int start) throws InvalidConfigException
     {
         List<Integer> blockIds = new ArrayList<Integer>();
-        for(int i = start; i < strings.size(); i++)
+        for (int i = start; i < strings.size(); i++)
         {
             blockIds.add(StringHelper.readBlockId(strings.get(i)));
         }
-        
+
         return blockIds;
     }
 

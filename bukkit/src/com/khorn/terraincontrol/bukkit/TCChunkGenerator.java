@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import net.minecraft.server.v1_4_6.Block;
+import net.minecraft.server.v1_5_R2.Block;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
@@ -43,14 +43,14 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
-        this.plugin.WorldInit(world);
+        this.plugin.onWorldInit(world);
         return this.BlockPopulator;
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
-        this.plugin.WorldInit(world);
+        this.plugin.onWorldInit(world);
 
         int i = world.getHighestBlockAt(x, z).getTypeId();
         return i != 0 && Block.byId[i].material.isSolid();
@@ -65,7 +65,7 @@ public class TCChunkGenerator extends ChunkGenerator
 
         byte[][] SectionBlocks = new byte[16][];
 
-        //TODO Too slow, for fix need change generator output.
+        // TODO Too slow, for fix need change generator output.
         int max_y = BlockArray.length / 256;
         for (int _x = 0; _x < 16; _x++)
             for (int _z = 0; _z < 16; _z++)

@@ -2,28 +2,29 @@ package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 /**
  * Represents a Resource: something that can generate in the world.
  */
-public abstract class Resource extends ConfigFunction<WorldConfig>
+public abstract class Resource extends ConfigFunction<BiomeConfig>
 {
     protected int blockId = -1;
     protected int blockData = -1;
     protected int frequency;
-    protected int rarity;
+    protected double rarity;
 
     @Override
-    public Class<WorldConfig> getHolderType()
+    public Class<BiomeConfig> getHolderType()
     {
-        return WorldConfig.class;
+        return BiomeConfig.class;
     }
 
     /**
@@ -52,6 +53,12 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
      */
     public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
+        if (!isValid())
+        {
+            // Don't process invalid resources
+            return;
+        }
+
         // Fire event
         if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
         {
@@ -61,7 +68,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         // Spawn
         spawnInChunk(world, random, villageInChunk, chunkX, chunkZ);
     }
-    
+
     /**
      * Called once per chunk, instead of once per attempt.
      * 
@@ -75,7 +82,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
     {
         for (int t = 0; t < frequency; t++)
         {
-            if (random.nextInt(100) > rarity)
+            if (random.nextDouble() * 100.0 > rarity)
                 continue;
             int x = chunkX * 16 + random.nextInt(16) + 8;
             int z = chunkZ * 16 + random.nextInt(16) + 8;
@@ -92,7 +99,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
      * @param args
      * @return
      */
-    public static Resource createResource(WorldConfig config, Class<? extends Resource> clazz, Object... args)
+    public static Resource createResource(BiomeConfig config, Class<? extends Resource> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for (Object arg : args)
@@ -115,10 +122,12 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         try
         {
             resource.load(stringArgs);
+            resource.setValid(true);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log("Invalid default resource! Please report! " + clazz.getName() + ": " + e.getMessage());
+            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! " + clazz.getName() + ": " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return resource;

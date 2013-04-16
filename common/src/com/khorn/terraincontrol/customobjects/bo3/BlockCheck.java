@@ -69,7 +69,7 @@ public class BlockCheck extends BO3Check
         for (int i = 0; i < blockIds.size(); i++)
         {
             builder.append(',');
-            builder.append(blockIds.get(i));
+            builder.append(makeMaterial(blockIds.get(i)));
             if (blockDatas.get(i) != -1)
             {
                 builder.append('.');
@@ -98,7 +98,7 @@ public class BlockCheck extends BO3Check
                 rotatedCheck.blockDatas.add((byte) -1);
             } else
             {
-                rotatedCheck.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
+                rotatedCheck.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
             }
         }
 

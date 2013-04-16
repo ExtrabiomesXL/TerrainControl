@@ -20,6 +20,12 @@ public class TreeObject implements CustomObject
         this.type = type;
     }
 
+    @Override
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
+        // Stub method
+    }
+
     public TreeObject(TreeType type, Map<String, String> settings)
     {
         this.type = type;
@@ -62,21 +68,9 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         return world.PlaceTree(type, random, x, y, z);
-    }
-
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
-    {
-        return world.PlaceTree(type, random, x, y, z);
-    }
-
-    @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int z)
-    {
-        return spawnAsTree(world, random, x, z);
     }
 
     @Override
@@ -92,12 +86,6 @@ public class TreeObject implements CustomObject
 
     @Override
     public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        return processAsTree(world, random, chunkX, chunkZ);
-    }
-
-    @Override
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         // A tree has no rarity, so spawn it once in the chunk
         int x = chunkX * 16 + random.nextInt(16);
@@ -117,4 +105,16 @@ public class TreeObject implements CustomObject
         return true;
     }
 
+    @Override
+    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    {
+        return true; // We can only guess...
+    }
+
+    @Override
+    public boolean canRotateRandomly()
+    {
+        // Trees cannot be rotated
+        return false;
+    }
 }

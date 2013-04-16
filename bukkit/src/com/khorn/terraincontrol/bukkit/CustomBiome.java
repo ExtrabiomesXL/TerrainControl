@@ -4,12 +4,12 @@ import com.khorn.terraincontrol.MobAlternativeNames;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.BiomeMeta;
-import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.EntityTypes;
+import net.minecraft.server.v1_5_R2.BiomeBase;
+import net.minecraft.server.v1_5_R2.BiomeMeta;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.EntityTypes;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -49,6 +49,9 @@ public class CustomBiome extends BiomeBase
         this.B = config.GroundBlock;
         this.temperature = config.BiomeTemperature;
         this.humidity = config.BiomeWetness;
+        if(this.humidity == 0) {
+            this.b(); // this.disableRain()
+        }
 
         // Mob spawning
         addMobs(this.J, config.spawnMonstersAddDefaults, config.spawnMonsters);

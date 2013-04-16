@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_4_6.StructurePiece;
-import net.minecraft.server.v1_4_6.StructureStart;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldGenNetherPiece15;
+import net.minecraft.server.v1_5_R2.StructurePiece;
+import net.minecraft.server.v1_5_R2.StructureStart;
+import net.minecraft.server.v1_5_R2.World;
+import net.minecraft.server.v1_5_R2.WorldGenNetherPiece15;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-class NetherFortressStart extends StructureStart
+public class NetherFortressStart extends StructureStart
 {
 
     @SuppressWarnings({"unchecked", "rawtypes"})

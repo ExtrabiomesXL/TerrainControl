@@ -3,6 +3,7 @@ package com.khorn.terraincontrol;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ public interface LocalWorld
 
     public LocalBiome getNullBiome(String name);
 
-    public int getMaxBiomesCount(); // With static id allocation this is not a
-    // required feature.
+    // With static id allocation this is not a required feature.
+    public int getMaxBiomesCount();
 
     public int getFreeBiomeId();
 
@@ -70,7 +71,7 @@ public interface LocalWorld
 
     public void replaceBlocks();
 
-    public void replaceBiomesLate();
+    public void replaceBiomes();
 
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.
@@ -91,10 +92,18 @@ public interface LocalWorld
 
     public void attachMetadata(int x, int y, int z, Tag tag);
 
+    public Tag getMetadata(int x, int y, int z);
+
     public int getLiquidHeight(int x, int z);
 
+    /**
+     * Returns the block above the highest solid block.
+     */
     public int getSolidHeight(int x, int z);
 
+    /**
+     * Returns the block above the highest block.
+     */
     public int getHighestBlockYAt(int x, int z);
 
     public DefaultMaterial getMaterial(int x, int y, int z);
@@ -106,6 +115,8 @@ public interface LocalWorld
     public boolean isLoaded(int x, int y, int z);
 
     public WorldConfig getSettings();
+
+    public CustomObjectStructureCache getStructureCache();
 
     public String getName();
 

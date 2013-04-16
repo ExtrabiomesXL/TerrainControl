@@ -1,9 +1,12 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
@@ -25,10 +28,10 @@ public class SingleWorld implements LocalWorld
     private ChunkProvider generator;
     private World world;
     private WorldConfig settings;
+    private CustomObjectStructureCache structureCache;
     private String name;
     private long seed;
-    private IBiomeManager biomeManager;
-    private TCWorldChunkManagerOld oldBiomeManager;
+    private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = 0;
     private static int maxBiomeCount = 256;
@@ -149,7 +152,7 @@ public class SingleWorld implements LocalWorld
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -163,7 +166,7 @@ public class SingleWorld implements LocalWorld
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
         return this.world.provider.worldChunkMgr.getTemperatures(new float[0], x, z, x_size, z_size);
     }
 
@@ -171,7 +174,7 @@ public class SingleWorld implements LocalWorld
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -185,14 +188,15 @@ public class SingleWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomeTC(x, z);
+            return this.biomeManager.getBiome(x, z);
         return this.world.provider.worldChunkMgr.getBiomeGenAt(x, z).biomeID;
     }
 
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.oldBiomeManager.oldTemperature[index] * this.oldBiomeManager.oldWetness[index];
+        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
+        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override
@@ -300,10 +304,10 @@ public class SingleWorld implements LocalWorld
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.getExtBlockID(sectionX, sectionY, sectionZ);
-                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.getYLocation() + sectionY];
+                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.getYLocation() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
@@ -320,7 +324,7 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBiomesLate()
+    public void replaceBiomes()
     {
         if (this.settings.HaveBiomeReplace)
         {
@@ -393,13 +397,12 @@ public class SingleWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getBlockID(x, y, z);
+            int id = chunk.getBlockID(x & 0xF, y, z & 0xF);
             if (DefaultMaterial.getMaterial(id).isSolid())
-                return y;
+                return y + 1;
         }
         return -1;
     }
@@ -438,17 +441,25 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        if (applyPhysics)
+        Chunk chunk = getChunk(x, 0, z);
+        if (chunk != null)
         {
-            world.setBlockAndMetadataWithUpdate(x, y, z, typeId, data, notifyPlayers);
-        } else
-        {
-            world.setBlockAndMetadata(x, y, z, typeId, data);
+            chunk.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, typeId, data);
+            // Workaround for (bug in?) Minecraft
+            if (chunk.getBlockStorageArray()[y >> 4] != null)
+                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
         }
-
         if (updateLight)
         {
-            this.world.updateAllLightTypes(x, y, z);
+            world.updateAllLightTypes(x, y, z);
+        }
+        if (applyPhysics)
+        {
+            world.notifyBlocksOfNeighborChange(x, y, z, typeId);
+        }
+        if (notifyPlayers)
+        {
+            // TODO
         }
     }
 
@@ -491,7 +502,8 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.getBlockLightValue(x, y, z);
+        // Actually, this calculates the block and skylight as it were day.
+        return world.getFullBlockLightValue(x, y, z);
     }
 
     @Override
@@ -561,6 +573,7 @@ public class SingleWorld implements LocalWorld
 
         this.world = world;
         this.seed = world.getSeed();
+        this.structureCache = new CustomObjectStructureCache(this);
 
         this.dungeonGen = new WorldGenDungeons();
         this.strongholdGen = new StrongholdGen(config);
@@ -585,14 +598,8 @@ public class SingleWorld implements LocalWorld
         this.generator = new ChunkProvider(this);
     }
 
-    public void setBiomeManager(IBiomeManager manager)
+    public void setBiomeManager(BiomeGenerator manager)
     {
-        this.biomeManager = manager;
-    }
-
-    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
-    {
-        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 
@@ -647,8 +654,36 @@ public class SingleWorld implements LocalWorld
         nmsTag.setInteger("x", x);
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
-        // Create a Tile Entity of it and add it to the world
-        TileEntity tileEntity = TileEntity.createAndLoadEntity(nmsTag);
-        world.setBlockTileEntity(x, y, z, tileEntity);
+        // Add that data to the current tile entity in the world
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if (tileEntity != null)
+        {
+            tileEntity.readFromNBT(nmsTag);
+        } else
+        {
+            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getBlockId(x, y, z));
+        }
+    }
+
+    @Override
+    public Tag getMetadata(int x, int y, int z)
+    {
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        NBTTagCompound nmsTag = new NBTTagCompound();
+        tileEntity.writeToNBT(nmsTag);
+        nmsTag.removeTag("x");
+        nmsTag.removeTag("y");
+        nmsTag.removeTag("z");
+        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
+    }
+
+    @Override
+    public CustomObjectStructureCache getStructureCache()
+    {
+        return this.structureCache;
     }
 }

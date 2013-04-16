@@ -1,13 +1,19 @@
 package com.khorn.terraincontrol.util;
 
-
 import com.khorn.terraincontrol.DefaultMaterial;
 
 public class BlockHelper
 {
 
-    @SuppressWarnings("PointlessBitwiseExpression")
-    public static int RotateData(int type, int data)
+    /**
+     * Rotate the block. North -> west - > south - > east
+     * 
+     * @param type
+     * @param data
+     * @return
+     */
+    @SuppressWarnings({"PointlessBitwiseExpression", "incomplete-switch"})
+    public static int rotateData(int type, int data)
     {
         DefaultMaterial mat = DefaultMaterial.getMaterial(type);
         if (mat == DefaultMaterial.UNKNOWN_BLOCK)
@@ -46,6 +52,7 @@ public class BlockHelper
 
             case POWERED_RAIL:
             case DETECTOR_RAIL:
+            case ACTIVATOR_RAIL:
                 int power = data & ~0x7;
                 switch (data & 0x7)
                 {
@@ -80,6 +87,8 @@ public class BlockHelper
             case BRICK_STAIRS:
             case SMOOTH_STAIRS:
             case NETHER_BRICK_STAIRS:
+            case SANDSTONE_STAIRS:
+            case QUARTZ_STAIRS:
                 switch (data)
                 {
                     case 2:
@@ -144,9 +153,9 @@ public class BlockHelper
             case WALL_SIGN:
             case CHEST:
             case ENDER_CHEST:
+            case TRAPPED_CHEST:
             case FURNACE:
             case BURNING_FURNACE:
-            case DISPENSER:
                 switch (data)
                 {
                     case 5:
@@ -157,6 +166,23 @@ public class BlockHelper
                         return 4;
                     case 3:
                         return 5;
+                }
+                break;
+
+            case DISPENSER:
+            case DROPPER:
+            case HOPPER:
+                int dispPower = data & 0x8;
+                switch (data & ~0x8)
+                {
+                    case 5:
+                        return 2 | dispPower;
+                    case 4:
+                        return 3 | dispPower;
+                    case 2:
+                        return 4 | dispPower;
+                    case 3:
+                        return 5 | dispPower;
                 }
                 break;
 
@@ -177,6 +203,8 @@ public class BlockHelper
 
             case DIODE_BLOCK_OFF:
             case DIODE_BLOCK_ON:
+            case REDSTONE_COMPARATOR_OFF:
+            case REDSTONE_COMPARATOR_ON:
                 int dir = data & 0x03;
                 int delay = data - dir;
                 switch (dir)
@@ -237,6 +265,7 @@ public class BlockHelper
                 return ((data + 3) & 0x3) | (data & ~0x3);
 
             case COCOA:
+            case TRIPWIRE_HOOK:
                 int rotationData = data % 4;
                 if (rotationData == 0)
                 {
@@ -256,10 +285,15 @@ public class BlockHelper
                     // West-east --> north-south
                     return data - 1;
                 }
+
+            case QUARTZ_BLOCK:
+                if (data == 3)
+                    return 4;
+                if (data == 4)
+                    return 3;
         }
 
         return data;
     }
-
 
 }

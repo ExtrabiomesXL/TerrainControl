@@ -8,13 +8,12 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
-import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_5_R2.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
-import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,33 +25,58 @@ import java.util.logging.Logger;
 
 public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {
-    private final HashMap<String, BukkitWorld> NotInitedWorlds = new HashMap<String, BukkitWorld>();
+    private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
 
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
+    // Debug setting. Set it to true to make Terrain Control try to disable
+    // itself. However, terrain generators aren't cleaned up properly by Bukkit,
+    // so this won't really work until that bug is fixed.
+    public boolean cleanupOnDisable = false;
+
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
+    @Override
     public void onDisable()
     {
-        TerrainControl.log("Can not be disabled.");
-        TerrainControl.stopEngine();
+        if (cleanupOnDisable)
+        {
+            // Cleanup worlds
+            for (BukkitWorld world : worlds.values())
+            {
+                world.disable();
+            }
+            worlds.clear();
+
+            TerrainControl.stopEngine();
+        }
     }
 
+    @Override
     public void onEnable()
     {
-        // Start the engine
-        TerrainControl.startEngine(this);
+        if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
+        {
+            // Reload "handling"
+            // (worlds are already loaded and TC didn't clean up itself)
+            log(Level.SEVERE, "The server was just /reloaded! Terrain Control has problems handling this,");
+            log(Level.SEVERE, "as old parts from before the reload have not been cleaned up.");
+            log(Level.SEVERE, "Unexpected things may happen! Please restart the server!");
+            log(Level.SEVERE, "In the future, instead of /reloading, please restart the server,");
+            log(Level.SEVERE, "or reload a plugin using it's built-in command (like /tc reload),");
+            log(Level.SEVERE, "or use a plugin managing plugin that can reload one plugin at a time.");
+            setEnabled(false);
+        } else
+        {
+            // Start the engine
+            TerrainControl.startEngine(this);
+            this.commandExecutor = new TCCommandExecutor(this);
+            this.listener = new TCListener(this);
+            Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
-        TCWorldChunkManagerOld.GenBiomeDiagram();
-
-        this.commandExecutor = new TCCommandExecutor(this);
-
-        this.listener = new TCListener(this);
-
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
-
-        TerrainControl.log("Enabled");
+            TerrainControl.log("Global objects loaded, waiting for worlds to load");
+        }
     }
 
     @Override
@@ -64,26 +88,48 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        if (worldName.trim().equals(""))
-        {
-            TerrainControl.log("world name is empty string !!");
-            return null;
+        if(worldName.equals("")) {
+            TerrainControl.log("Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
+            return new TCChunkGenerator(this);
+        }
+        if(worldName.equals("test")) {
+            TerrainControl.log("Ignoring world with the name \"test\". This is not a valid world name,");
+            TerrainControl.log("as it's used by Multiverse to check if \"TerrainControl\" a valid generator name.");
+            TerrainControl.log("So if you were just using /mv create, don't worry about this message.");
+            return new TCChunkGenerator(this);
         }
 
+        // Check if not already enabled
         for (BukkitWorld world : worlds.values())
         {
             if (world.getName().equals(worldName))
             {
-                TerrainControl.log("enabled for '" + worldName + "'");
+                TerrainControl.log("Already enabled for '" + worldName + "'");
                 return world.getChunkGenerator();
             }
         }
 
-        TCChunkGenerator generator = null;
-        BukkitWorld world = new BukkitWorld(worldName);
-        WorldConfig conf = this.CreateSettings(worldName, world);
+        TerrainControl.log("Starting to enable world '" + worldName + "'...");
 
-        switch (conf.ModeTerrain)
+        // Create BukkitWorld instance
+        BukkitWorld localWorld = new BukkitWorld(worldName);
+
+        // Hack to initialize CraftBukkit's biome mappings
+        // This is really needed. Try for yourself if you don't believe it,
+        // you will get a java.lang.IllegalArgumentException when adding biomes
+        CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
+        
+        // Load settings
+        File baseFolder = getWorldSettingsFolder(worldName);
+        WorldConfig worldConfig = new WorldConfig(baseFolder, localWorld, false);
+        localWorld.setSettings(worldConfig);
+
+        // Add the world to the to-do list
+        this.notInitedWorlds.put(worldName, localWorld);
+
+        // Get the right chunk generator
+        TCChunkGenerator generator = null;
+        switch (worldConfig.ModeTerrain)
         {
             case Normal:
             case TerrainTest:
@@ -95,74 +141,37 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
                 break;
         }
 
-        world.setChunkGenerator(generator);
-
-        TerrainControl.log("mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
+        // Set and return the generator
+        localWorld.setChunkGenerator(generator);
         return generator;
     }
 
-    public WorldConfig CreateSettings(String worldName, BukkitWorld bukkitWorld)
+    public File getWorldSettingsFolder(String worldName)
     {
-        File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
-
-        TerrainControl.log("Loading settings for " + worldName);
-
+        File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
         if (!baseFolder.exists())
         {
             TerrainControl.log("settings does not exist, creating defaults");
 
             if (!baseFolder.mkdirs())
-                TerrainControl.log("cant create folder " + baseFolder.getName());
+                TerrainControl.log(Level.SEVERE, "cant create folder " + baseFolder.getName());
         }
-        // Get for init BiomeMapping
-        CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
-        WorldConfig worldConfig;
-        if (bukkitWorld == null)
-        {
-            bukkitWorld = new BukkitWorld(worldName);
-            worldConfig = new WorldConfig(baseFolder, bukkitWorld, true);
-
-        } else
-        {
-            worldConfig = new WorldConfig(baseFolder, bukkitWorld, false);
-            bukkitWorld.setSettings(worldConfig);
-            this.NotInitedWorlds.put(worldName, bukkitWorld);
-        }
-
-        TerrainControl.log("settings for '" + worldName + "' loaded");
-        return worldConfig;
+        return baseFolder;
     }
 
-    public void WorldInit(World world)
+    public void onWorldInit(World world)
     {
-        if (this.NotInitedWorlds.containsKey(world.getName()))
+        if (this.notInitedWorlds.containsKey(world.getName()))
         {
-            BukkitWorld bukkitWorld = this.NotInitedWorlds.remove(world.getName());
+            // Remove the world from the to-do list
+            BukkitWorld bukkitWorld = this.notInitedWorlds.remove(world.getName());
 
-            net.minecraft.server.v1_4_6.World workWorld = ((CraftWorld) world).getHandle();
+            // Enable and register the world
+            bukkitWorld.enable(world);
+            this.worlds.put(world.getUID(), bukkitWorld);
 
-            bukkitWorld.Init(workWorld);
-
-            switch (bukkitWorld.getSettings().ModeBiome)
-            {
-                case FromImage:
-                case Normal:
-                    TCWorldChunkManager manager = new TCWorldChunkManager(bukkitWorld);
-                    workWorld.worldProvider.d = manager;
-                    bukkitWorld.setBiomeManager(manager);
-                    break;
-                case OldGenerator:
-                    TCWorldChunkManagerOld managerOld = new TCWorldChunkManagerOld(bukkitWorld);
-                    workWorld.worldProvider.d = managerOld;
-                    bukkitWorld.setOldBiomeManager(managerOld);
-                    break;
-                case Default:
-                    break;
-            }
-
-            this.worlds.put(workWorld.getDataManager().getUUID(), bukkitWorld);
-
-            TerrainControl.log("world initialized with seed is " + workWorld.getSeed());
+            // Show message
+            TerrainControl.log("World " + bukkitWorld.getName() + " is now enabled!");
         }
     }
 

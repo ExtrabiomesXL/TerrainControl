@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
@@ -100,7 +101,7 @@ public class ChunkProviderTC
         int i4 = i1 + 1;
         int i5 = this.height / 8 + 1;
         int i6 = i1 + 1;
-        if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
+        if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 16, chunkZ * 16, 16, 16);
         } else
@@ -375,7 +376,7 @@ public class ChunkProviderTC
 
     private void oldTerrainNoise(int x, int z, int i4, int max_X, int max_Y, double d3)
     {
-        if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
+        if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.VolatilityFactor = (1.0D - localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
 

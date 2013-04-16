@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.biomelayers.layers;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -106,6 +107,7 @@ public abstract class Layer
                 }
 
             }
+
             if (normalBiomes.size() != 0)
                 NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + config.normalBiomesRarity]);
             else
@@ -213,7 +215,7 @@ public abstract class Layer
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
-        if (config.ModeBiome == WorldConfig.BiomeMode.FromImage)
+        if (config.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
 
             if (config.imageMode == WorldConfig.ImageMode.ContinueNormal)
