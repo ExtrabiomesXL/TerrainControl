@@ -1,15 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.UseBiome;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.generator.resourcegens.*;
-import com.khorn.terraincontrol.util.StringHelper;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -18,6 +8,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.UseBiome;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.generator.resourcegens.AboveWaterGen;
+import com.khorn.terraincontrol.generator.resourcegens.CactusGen;
+import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
+import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
+import com.khorn.terraincontrol.generator.resourcegens.DungeonGen;
+import com.khorn.terraincontrol.generator.resourcegens.GrassGen;
+import com.khorn.terraincontrol.generator.resourcegens.LiquidGen;
+import com.khorn.terraincontrol.generator.resourcegens.OreGen;
+import com.khorn.terraincontrol.generator.resourcegens.PlantGen;
+import com.khorn.terraincontrol.generator.resourcegens.ReedGen;
+import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
+import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
+import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.resourcegens.UnderWaterOreGen;
+import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
+import com.khorn.terraincontrol.generator.resourcegens.VinesGen;
+import com.khorn.terraincontrol.generator.resourcegens.WellGen;
+import com.khorn.terraincontrol.util.StringHelper;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -281,6 +300,9 @@ public class BiomeConfig extends ConfigFile
                     resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35, TreeType.CocoaTree, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
+                default:
+                	
+                	break;
 
             }
         if (this.DefaultWaterLily > 0)

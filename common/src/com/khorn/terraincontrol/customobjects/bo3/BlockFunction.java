@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import java.util.List;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.BlockHelper;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * Represents a block in a BO3.

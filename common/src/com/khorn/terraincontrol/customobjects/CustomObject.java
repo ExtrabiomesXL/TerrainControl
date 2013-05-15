@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-
 import java.util.Map;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 
 public interface CustomObject
 {

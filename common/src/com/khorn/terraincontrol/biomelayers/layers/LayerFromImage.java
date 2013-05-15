@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 public class LayerFromImage extends Layer
 {

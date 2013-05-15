@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.BlockHelper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockCheck extends BO3Check
 {

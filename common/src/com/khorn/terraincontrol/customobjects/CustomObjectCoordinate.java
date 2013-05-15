@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.LocalWorld;
-
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
 
 /**
  * Holds a custom object along with the absolute spawn coordinates.

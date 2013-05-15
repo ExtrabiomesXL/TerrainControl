@@ -1,15 +1,15 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.customobjects.Branch;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.customobjects.Rotation;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class BranchFunction extends BO3Function implements Branch
 {

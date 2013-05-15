@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.util;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Some methods for string parsing and printing.

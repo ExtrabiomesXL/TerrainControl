@@ -1,17 +1,21 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.*;
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
-import com.khorn.terraincontrol.util.MathHelper;
-
 import java.io.File;
 import java.util.Map;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.customobjects.Branch;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
+import com.khorn.terraincontrol.customobjects.Rotation;
+import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
+import com.khorn.terraincontrol.util.MathHelper;
 
 public class BO3 implements StructuredCustomObject
 {

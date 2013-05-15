@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
-
 import java.util.Random;
+
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 
 /**
  * Represents CustomObjects that can have other objects attached

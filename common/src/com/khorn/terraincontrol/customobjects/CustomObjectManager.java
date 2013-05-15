@@ -1,15 +1,15 @@
 package com.khorn.terraincontrol.customobjects;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is the registry for the custom object types. It also stores

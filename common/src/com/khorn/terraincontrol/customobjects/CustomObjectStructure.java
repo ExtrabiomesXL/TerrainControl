@@ -1,11 +1,15 @@
 package com.khorn.terraincontrol.customobjects;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.RandomHelper;
-
-import java.util.*;
 
 /**
  * This class creates the branch structure based on one parent object, and spawns all

@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.MathHelper;
-
 import java.util.List;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.MathHelper;
 
 /**
  * Represents a single ore vein.

@@ -1,11 +1,23 @@
 package com.khorn.terraincontrol.configuration;
 
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.TerrainControl;
-
-import java.awt.Color;
-import java.io.*;
-import java.util.*;
 
 public abstract class ConfigFile
 {

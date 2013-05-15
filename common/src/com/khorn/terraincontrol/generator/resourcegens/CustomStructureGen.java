@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.*;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
+import com.khorn.terraincontrol.customobjects.Rotation;
+import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 public class CustomStructureGen extends Resource
 {

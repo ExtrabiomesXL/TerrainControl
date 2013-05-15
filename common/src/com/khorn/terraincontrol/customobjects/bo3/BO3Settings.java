@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.configuration.TCSetting;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 
 public enum BO3Settings implements TCSetting
 {

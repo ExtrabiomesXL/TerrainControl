@@ -1,10 +1,5 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.Tag;
-import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,6 +8,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 
 public class BO3Loader implements CustomObjectLoader
 {

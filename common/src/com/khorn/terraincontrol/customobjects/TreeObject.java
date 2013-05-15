@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.customobjects;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 
 public class TreeObject implements CustomObject
 {

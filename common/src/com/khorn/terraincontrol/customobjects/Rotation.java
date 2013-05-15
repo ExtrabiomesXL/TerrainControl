@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-
 import java.util.Random;
+
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 /**
  * An enum to help with CustomObject rotation.

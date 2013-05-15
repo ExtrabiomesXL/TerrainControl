@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.biomegenerators;
 
+import java.util.Random;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
-
-import java.util.Random;
 
 public class OldBiomeGenerator extends BiomeGenerator
 {

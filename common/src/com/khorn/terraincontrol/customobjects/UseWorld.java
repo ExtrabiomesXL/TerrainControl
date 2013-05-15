@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.customobjects;
 
+import java.util.Map;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-
-import java.util.Map;
-import java.util.Random;
 
 /**
  * UseWorld is a keyword that spawns the objects in the WorldObjects folder.

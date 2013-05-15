@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.generator.terrainsgens;
 
+import java.util.Random;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MathHelper;
-
-import java.util.Random;
 
 public class CanyonsGen extends TerrainGenBase
 {

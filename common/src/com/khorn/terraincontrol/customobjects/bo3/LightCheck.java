@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import java.util.List;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-
-import java.util.List;
 
 public class LightCheck extends BO3Check
 {

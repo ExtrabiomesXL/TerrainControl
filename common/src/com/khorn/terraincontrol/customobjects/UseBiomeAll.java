@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.LocalWorld;
-
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
 
 public class UseBiomeAll extends UseBiome
 {

@@ -1,19 +1,26 @@
 package com.khorn.terraincontrol;
 
+import java.util.ArrayList;
+import java.util.Random;
+
+import net.extrabiomes.generation.biomes.ExtraBiomesBiome;
+import net.extrabiomes.terraincontrol.Biome;
+
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public interface LocalWorld
 {
     // Biome init
+	public Biome AddVanillaBiome(int biomeID);
+	
     public LocalBiome AddBiome(String name, int id);
-
+    
+    public LocalBiome AddBiome(ExtraBiomesBiome biome, int id);
+    
     public LocalBiome getNullBiome(String name);
 
     // With static id allocation this is not a required feature.

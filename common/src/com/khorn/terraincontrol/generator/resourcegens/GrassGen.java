@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 public class GrassGen extends Resource
 {

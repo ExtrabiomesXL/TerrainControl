@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.events;
 
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
-
-import java.util.Random;
 
 /**
  * Inherit this class, override methods as necessary and register it with

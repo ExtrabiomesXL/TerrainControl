@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.customobjects;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.RandomHelper;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 /**
  * Each world has a cache of unfinished structures. This class is the cache.

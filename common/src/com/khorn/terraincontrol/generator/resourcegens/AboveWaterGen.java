@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-
 import java.util.List;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 public class AboveWaterGen extends Resource
 {

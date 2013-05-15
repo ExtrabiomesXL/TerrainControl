@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.generator;
 
+import java.util.Random;
+
+import net.extrabiomes.generation.ExtraBiomesWorldGenerator;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -10,8 +14,6 @@ import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
 import com.khorn.terraincontrol.util.MathHelper;
 import com.khorn.terraincontrol.util.NoiseGeneratorOctaves;
-
-import java.util.Random;
 
 
 @SuppressWarnings({"PointlessArithmeticExpression"})
@@ -453,6 +455,8 @@ public class ChunkProviderTC
 
         boolean dry = ReplaceForBiomeAndReturnWaterless(x, z, arrayOfByte);
 
+        ExtraBiomesWorldGenerator.instance.PostGenerate(arrayOfByte);
+        
         this.CaveGen.a(x, z, arrayOfByte);
         this.CanyonGen.a(x, z, arrayOfByte);
 

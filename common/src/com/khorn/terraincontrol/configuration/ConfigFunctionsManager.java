@@ -1,13 +1,30 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.generator.resourcegens.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.generator.resourcegens.AboveWaterGen;
+import com.khorn.terraincontrol.generator.resourcegens.CactusGen;
+import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
+import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
+import com.khorn.terraincontrol.generator.resourcegens.DungeonGen;
+import com.khorn.terraincontrol.generator.resourcegens.GrassGen;
+import com.khorn.terraincontrol.generator.resourcegens.LiquidGen;
+import com.khorn.terraincontrol.generator.resourcegens.OreGen;
+import com.khorn.terraincontrol.generator.resourcegens.PlantGen;
+import com.khorn.terraincontrol.generator.resourcegens.ReedGen;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
+import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
+import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
+import com.khorn.terraincontrol.generator.resourcegens.UnderWaterOreGen;
+import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
+import com.khorn.terraincontrol.generator.resourcegens.VeinGen;
+import com.khorn.terraincontrol.generator.resourcegens.VinesGen;
+import com.khorn.terraincontrol.generator.resourcegens.WellGen;
 
 public class ConfigFunctionsManager
 {

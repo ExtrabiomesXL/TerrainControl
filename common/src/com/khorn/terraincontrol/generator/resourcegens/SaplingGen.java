@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -7,10 +11,6 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.Rotation;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class SaplingGen extends ConfigFunction<BiomeConfig>
 {

@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.generator.terrainsgens;
 
-import com.khorn.terraincontrol.LocalWorld;
-
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
 
 public class TerrainGenBase
 {
