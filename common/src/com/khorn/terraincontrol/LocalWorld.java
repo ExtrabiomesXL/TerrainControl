@@ -17,6 +17,8 @@ public interface LocalWorld
     // Biome init
 	public Biome AddVanillaBiome(int biomeID);
 	
+	public void AddCustomBiome(ExtraBiomesBiome biome); 
+	
     public LocalBiome AddBiome(String name, int id);
     
     public LocalBiome AddBiome(ExtraBiomesBiome biome, int id);
@@ -33,6 +35,8 @@ public interface LocalWorld
     public int getBiomeIdByName(String name);
 
     public ArrayList<LocalBiome> getDefaultBiomes();
+    
+    public ArrayList<LocalBiome> getCustomBiomes();
 
     // Biome manager
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size);

@@ -54,7 +54,7 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].RiverBiome.isEmpty())
+                if (this.worldConfig.biomeConfigs[cachedId] != null && this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].RiverBiome.isEmpty())
                     currentPiece = this.RiverBiomes[cachedId];
                 else
                     currentPiece = cachedId;

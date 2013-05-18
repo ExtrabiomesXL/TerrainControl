@@ -165,11 +165,13 @@ public class WorldConfig extends ConfigFile
     public int WorldHeight;
 
     public long resourcesSeed;
+    public LocalWorld world;
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
+        this.world = world;
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -254,7 +256,7 @@ public class WorldConfig extends ConfigFile
             {
                 TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
             }
-            this.biomeConfigs[localBiome.getId()] = config;
+            this.biomeConfigs[localBiome.getCustomId()] = config;
 
             if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
             {
@@ -425,6 +427,12 @@ public class WorldConfig extends ConfigFile
         this.IceBiomes = readSettings(TCDefaultValues.IceBiomes);
         this.IsleBiomes = readSettings(TCDefaultValues.IsleBiomes);
         this.BorderBiomes = readSettings(TCDefaultValues.BorderBiomes);
+        
+        for(LocalBiome b : world.getCustomBiomes()){
+        	this.CustomBiomes.add(b.getName());
+        	this.CustomBiomeIds.put(b.getName(), b.getId());
+        }
+        
         ReadCustomBiomes();
 
         // Images
